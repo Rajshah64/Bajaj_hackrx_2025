@@ -193,5 +193,8 @@ async def get_status():
 
 if __name__ == "__main__":
     import uvicorn
-    logger.info("Starting PURE ADVANCED RAG-Powered Query-Retrieval System")
-    uvicorn.run(app, host="0.0.0.0", port=8000) 
+    # Server config from environment
+    host = os.getenv("HOST", "0.0.0.0")
+    port = int(os.getenv("PORT", "8000"))
+    logger.info(f"Starting server (HTTP) on http://{host}:{port}")
+    uvicorn.run(app, host=host, port=port)

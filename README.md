@@ -1,60 +1,87 @@
-# Advanced RAG-Powered Query-Retrieval System
+## Advanced RAG-Powered Query-Retrieval System
 
-A FastAPI-based intelligent document query system that uses advanced RAG (Retrieval-Augmented Generation) to provide accurate answers from PDF documents.
+A FastAPI-based document QA system that uses a hybrid Retrieval-Augmented Generation (RAG) pipeline with cross-encoder reranking to answer questions from PDF documents.
 
-## Features
+### Features
 
-- **Advanced RAG Pipeline**: Hybrid retrieval combining BM25 (keyword) and FAISS (semantic) search
-- **Cross-Encoder Reranking**: Uses neural models to re-rank search results for maximum relevance
-- **Multi-Method PDF Processing**: Extracts text using pdfplumber, PyMuPDF, and PyPDF2
-- **Content-Aware Chunking**: Intelligently separates text and tables during processing
-- **Google Gemini Integration**: Generates contextual answers using LLM
-- **Bearer Token Authentication**: Secure API access
-- **Async Processing**: Non-blocking document processing and query handling
+- **Hybrid Retrieval (BM25 + FAISS)**: Combines keyword and semantic search
+- **Cross-Encoder Reranking**: Neural reranker for high-precision top results
+- **Multi-Method PDF Extraction**: `pdfplumber`, `PyMuPDF`, and `PyPDF2`
+- **Content-Aware Chunking**: Separates text and tables for cleaner context
+- **Google Gemini Integration**: LLM-powered answer generation
+- **Bearer Token Authentication**: Protects API endpoints
+- **Async Processing**: Non-blocking retrieval and generation
+- **Device-Aware Inference**: Runs on CPU or CUDA (with safe fallback)
 
-## Technology Stack
+### Technology Stack
 
-- **FastAPI**: Web framework
-- **Google Gemini**: Large Language Model
-- **FAISS**: Vector similarity search
-- **Sentence Transformers**: Text embeddings
-- **BM25**: Keyword-based search
-- **Cross-Encoder**: Neural reranking
-- **PDF Processing**: pdfplumber, PyMuPDF, PyPDF2
+- FastAPI, httpx
+- FAISS, rank_bm25, sentence-transformers, cross-encoder
+- pdfplumber, PyMuPDF (fitz), PyPDF2
+- Google Generative AI (Gemini)
 
 ## Installation
 
-1. Clone the repository
-2. Create virtual environment:
-   ```bash
-   python -m venv venv
-   venv\Scripts\activate  # Windows
-   source venv/bin/activate  # Linux/Mac
-   ```
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+1. Create and activate a virtualenv
 
-## Usage
+```bash
+python -m venv venv
+venv\Scripts\activate  # Windows PowerShell
+# source venv/bin/activate  # Linux/Mac
+```
 
-### Start the Server
+2. Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+## Configuration (.env)
+
+Create a `.env` in the project root. Minimum keys:
+
+```env
+# LLM
+GEMINI_API_KEY=your_gemini_api_key_here  # If unset, a demo fallback is used
+
+# Auth
+BEARER_TOKEN=c1c19bb08f894ca1605c6cf9cf949ed137a2857e14dc46a322a1417058a80507
+
+# Device selection (optional): cpu or cuda
+RAG_DEVICE=cpu
+
+# Models (optional)
+EMBEDDING_MODEL=BAAI/bge-large-en-v1.5
+RERANKER_MODEL=BAAI/bge-reranker-large
+
+# Logging (optional)
+LOG_LEVEL=INFO
+```
+
+Notes:
+
+- Set `RAG_DEVICE=cuda` to request GPU; it automatically falls back to CPU if CUDA is unavailable.
+- The service reads `RAG_DEVICE`; you can also pass `device` when constructing `AdvancedRAGService` in code.
+
+## Running
 
 ```bash
 python main.py
 ```
 
-### API Endpoints
+Base URL: `http://localhost:8000/api/v1`
 
-- `GET /api/v1/` - Root endpoint
-- `GET /api/v1/health` - Health check
-- `GET /api/v1/status` - System status
-- `POST /api/v1/hackrx/run` - Main query endpoint
+### Endpoints
 
-### Example Request
+- `GET /api/v1/` — Root
+- `GET /api/v1/health` — Health check
+- `GET /api/v1/status` — System status and RAG stats (device, models)
+- `POST /api/v1/hackrx/run` — Main query endpoint
+
+### Example request
 
 ```bash
-curl -X POST "https://localhost:8000/api/v1/hackrx/run" \
+curl -X POST "http://localhost:8000/api/v1/hackrx/run" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer c1c19bb08f894ca1605c6cf9cf949ed137a2857e14dc46a322a1417058a80507" \
   -d '{
@@ -65,28 +92,22 @@ curl -X POST "https://localhost:8000/api/v1/hackrx/run" \
 
 ## Testing
 
-- `python test_system.py` - Full system test
-- `python test_api_quick.py` - Quick API test
-- `python test_advanced_direct.py` - Direct RAG service test
+- `python test_system.py` — Full test suite (API + direct RAG checks)
+- `python test_api_quick.py` — Quick API check for critical questions
+- `python test_advanced_direct.py` — Direct `AdvancedRAGService` verification
 
 ## Project Structure
 
 ```
-├── main.py                    # FastAPI application
+├── main.py                     # FastAPI application
 ├── services/
-│   ├── advanced_rag_service.py  # Core RAG implementation
+│   ├── advanced_rag_service.py # Core hybrid retrieval + reranking
 │   └── llm_service.py          # Google Gemini integration
-├── test_system.py             # Comprehensive testing
-├── requirements.txt           # Dependencies
-└── README.md                 # This file
-```
-
-## Environment Variables
-
-Create a `.env` file with:
-
-```
-GOOGLE_API_KEY=your_gemini_api_key
+├── test_system.py              # Comprehensive testing
+├── test_api_quick.py           # Quick API test
+├── test_advanced_direct.py     # Direct RAG test
+├── requirements.txt            # Dependencies
+└── README.md                   # This file
 ```
 
 ## License

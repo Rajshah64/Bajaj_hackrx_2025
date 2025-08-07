@@ -113,4 +113,6 @@ transformers_cache/
 
 # Temporary processing files
 temp_document.pdf
-temp_* 
+temp_*
+localhost.crt
+localhost.key
