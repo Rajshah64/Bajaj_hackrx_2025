@@ -75,7 +75,7 @@ class AdvancedRAGService:
             logger.info(f"Initialized AdvancedRAGService with embedding model: '{embedding_model}' and reranker: '{reranker_model}'")
 
         except Exception as e:
-            logger.error(f"❌ Error initializing service: {e}")
+            logger.error(f"Error initializing service: {e}")
             raise
 
     async def download_and_process_pdf(self, pdf_url: str, chunk_strategy: str = "auto"):
@@ -136,7 +136,7 @@ class AdvancedRAGService:
             await self._build_indexes()
 
         except Exception as e:
-            logger.error(f"❌ Failed to process PDF and build indexes: {e}")
+            logger.error(f"Failed to process PDF and build indexes: {e}")
             raise
 
     def _extract_pdf_content(self, pdf_path: str) -> Dict[str, Any]:

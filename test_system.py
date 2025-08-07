@@ -56,14 +56,14 @@ async def test_health_endpoint():
             response = await client.get(f"{BASE_URL}/api/v1/health")
             
             if response.status_code == 200:
-                logger.info("✅ Health check passed")
+                logger.info("Health check passed")
                 return True
             else:
-                logger.error(f"❌ Health check failed: {response.status_code}")
+                logger.error(f"Health check failed: {response.status_code}")
                 return False
                 
     except Exception as e:
-        logger.error(f"❌ Health check error: {str(e)}")
+        logger.error(f"Health check error: {str(e)}")
         return False
 
 async def test_status_endpoint():
@@ -74,21 +74,21 @@ async def test_status_endpoint():
             
             if response.status_code == 200:
                 data = response.json()
-                logger.info("✅ Status check passed")
+                logger.info("Status check passed")
                 logger.info(f"   Version: {data.get('version')}")
                 logger.info(f"   Features: {data.get('features', [])}")
                 
                 rag_stats = data.get('rag_stats', {})
                 if rag_stats.get('version') == 'advanced_rag':
-                    logger.info("🚀 ADVANCED RAG service confirmed!")
+                    logger.info("ADVANCED RAG service confirmed!")
                 
                 return True
             else:
-                logger.error(f"❌ Status check failed: {response.status_code}")
+                logger.error(f"Status check failed: {response.status_code}")
                 return False
                 
     except Exception as e:
-        logger.error(f"❌ Status check error: {str(e)}")
+        logger.error(f"Status check error: {str(e)}")
         return False
 
 async def test_direct_advanced_rag():
@@ -132,7 +132,7 @@ async def test_direct_advanced_rag():
         return True
         
     except Exception as e:
-        logger.error(f"❌ Direct advanced RAG error: {str(e)}")
+        logger.error(f"Direct advanced RAG error: {str(e)}")
         import traceback
         traceback.print_exc()
         return False
@@ -175,19 +175,19 @@ async def test_main_endpoint():
             for i, (question, answer) in enumerate(zip(SAMPLE_REQUEST['questions'], answers)):
                 print(f"\nQuestion {i+1}:")
                 print(f"   {question}")
-                print(f"\n💡 Advanced RAG Answer:")
+                print(f"\nAdvanced RAG Answer:")
                 print(f"   {answer}")
                 print("-" * 80)
             
             return True, answers
             
         else:
-            logger.error(f"❌ Advanced RAG API test failed: {response.status_code}")
+            logger.error(f"Advanced RAG API test failed: {response.status_code}")
             logger.error(f"   Response: {response.text}")
             return False, []
             
     except Exception as e:
-        logger.error(f"❌ Advanced RAG API test error: {str(e)}")
+        logger.error(f"Advanced RAG API test error: {str(e)}")
         return False, []
 
 def evaluate_answers(generated_answers):
@@ -230,7 +230,7 @@ def evaluate_answers(generated_answers):
         return accuracy
         
     except Exception as e:
-        logger.error(f"❌ Error evaluating answers: {str(e)}")
+        logger.error(f"Error evaluating answers: {str(e)}")
         return 0
 
 async def run_full_test_suite():

@@ -38,11 +38,11 @@ async def test_health():
                 logger.info(f"   Version: {data.get('version')}")
                 return True
             else:
-                logger.error(f"❌ Health check failed: {response.status_code}")
+                logger.error(f"Health check failed: {response.status_code}")
                 return False
                 
     except Exception as e:
-        logger.error(f"❌ Health check error: {str(e)}")
+        logger.error(f"Health check error: {str(e)}")
         return False
 
 async def test_status():
@@ -63,11 +63,11 @@ async def test_status():
                 
                 return True
             else:
-                logger.error(f"❌ Status check failed: {response.status_code}")
+                logger.error(f"Status check failed: {response.status_code}")
                 return False
                 
     except Exception as e:
-        logger.error(f"❌ Status check error: {str(e)}")
+        logger.error(f"Status check error: {str(e)}")
         return False
 
 async def test_api():
@@ -101,7 +101,7 @@ async def test_api():
             for i, (question, answer) in enumerate(zip(TEST_REQUEST['questions'], answers)):
                 print(f"\nQuestion {i+1}:")
                 print(f"   {question}")
-                print(f"\n💡 Pure Advanced RAG Answer:")
+                print(f"\nPure Advanced RAG Answer:")
                 print(f"   {answer}")
                 
                 # Check if we still get the "OpenAI API key" fallback
@@ -115,12 +115,12 @@ async def test_api():
             return True, answers
             
         else:
-            logger.error(f"❌ API test failed: {response.status_code}")
+            logger.error(f"API test failed: {response.status_code}")
             logger.error(f"   Response: {response.text}")
             return False, []
             
     except Exception as e:
-        logger.error(f"❌ API test error: {str(e)}")
+        logger.error(f"API test error: {str(e)}")
         return False, []
 
 async def run_quick_test():
@@ -151,7 +151,7 @@ async def run_quick_test():
     if health_ok and status_ok and api_ok:
         print("\nPURE ADVANCED RAG SYSTEM IS WORKING!")
     else:
-        print("\n❌ SYSTEM HAS ISSUES")
+        print("\nSYSTEM HAS ISSUES")
     
     return health_ok and status_ok and api_ok
 

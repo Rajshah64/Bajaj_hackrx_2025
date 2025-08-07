@@ -27,7 +27,7 @@ def check_dependencies():
         logger.info("All dependencies are installed")
         return True
     except ImportError as e:
-        logger.error(f"❌ Missing dependency: {e}")
+        logger.error(f"Missing dependency: {e}")
         logger.info("Please run: pip install -r requirements.txt")
         return False
 
@@ -54,7 +54,7 @@ def setup_environment():
         return True
         
     except Exception as e:
-        logger.error(f"❌ Error setting up environment: {e}")
+        logger.error(f"Error setting up environment: {e}")
         return False
 
 def run_server(host="0.0.0.0", port=8000, reload=False):
@@ -78,7 +78,7 @@ def run_server(host="0.0.0.0", port=8000, reload=False):
     except KeyboardInterrupt:
         logger.info("Server stopped by user")
     except Exception as e:
-        logger.error(f"❌ Error running server: {e}")
+        logger.error(f"Error running server: {e}")
 
 def run_tests():
     """Run the test suite"""
@@ -86,7 +86,7 @@ def run_tests():
         logger.info("Running test suite...")
         subprocess.run([sys.executable, "test_system.py"])
     except Exception as e:
-        logger.error(f"❌ Error running tests: {e}")
+        logger.error(f"Error running tests: {e}")
 
 def main():
     parser = argparse.ArgumentParser(

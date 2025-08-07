@@ -97,7 +97,7 @@ async def process_queries(
         return QueryResponse(answers=answers)
         
     except Exception as e:
-        logger.error(f"❌ Error processing queries with advanced RAG: {str(e)}")
+        logger.error(f"Error processing queries with advanced RAG: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error processing queries: {str(e)}"
@@ -148,7 +148,7 @@ async def process_queries_pure_advanced_rag(document_url: str, questions: List[s
                 logger.info(f"Generated answer {i+1}/{len(questions)}")
                 
             except Exception as e:
-                logger.error(f"❌ Error processing question {i+1}: {str(e)}")
+                logger.error(f"Error processing question {i+1}: {str(e)}")
                 answers.append(f"I apologize, but I encountered an error while processing this question: {str(e)}")
         
         return answers

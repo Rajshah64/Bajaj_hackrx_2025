@@ -48,7 +48,7 @@ async def test_advanced_rag_direct():
             results = rag_service.query(question, top_k=5)
             
             if not results:
-                print("❌ No results found!")
+                print("No results found!")
                 continue
             
             print(f"Found {len(results)} results:")
@@ -78,7 +78,7 @@ async def test_advanced_rag_direct():
         return True
         
     except Exception as e:
-        logger.error(f"❌ Test failed: {str(e)}")
+        logger.error(f"Test failed: {str(e)}")
         import traceback
         traceback.print_exc()
         return False
