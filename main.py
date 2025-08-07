@@ -60,17 +60,17 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
         )
     return credentials.credentials
 
-@app.get("/")
+@app.get("/api/v1/")
 async def root():
     """Root endpoint"""
     return {"message": "Advanced RAG-Powered Intelligent Query-Retrieval System", "version": "3.0.0"}
 
-@app.get("/health")
+@app.get("/api/v1/health")
 async def health_check():
     """Health check endpoint"""
     return {"status": "healthy", "message": "Advanced RAG system is operational", "version": "3.0.0"}
 
-@app.post("/hackrx/run", response_model=QueryResponse)
+@app.post("/api/v1/hackrx/run", response_model=QueryResponse)
 async def process_queries(
     request: QueryRequest,
     token: str = Depends(verify_token)

@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Test configuration
-BASE_URL = "http://localhost:8000"
+BASE_URL = "https://localhost:8000"
 BEARER_TOKEN = "c1c19bb08f894ca1605c6cf9cf949ed137a2857e14dc46a322a1417058a80507"
 
 # Test with just the problematic questions
@@ -29,8 +29,8 @@ TEST_REQUEST = {
 async def test_health():
     """Test health endpoint"""
     try:
-        async with httpx.AsyncClient() as client:
-            response = await client.get(f"{BASE_URL}/health")
+        async with httpx.AsyncClient(verify=False) as client:
+            response = await client.get(f"{BASE_URL}/api/v1/health")
             
             if response.status_code == 200:
                 data = response.json()
@@ -48,7 +48,7 @@ async def test_health():
 async def test_status():
     """Test status endpoint"""
     try:
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(verify=False) as client:
             response = await client.get(f"{BASE_URL}/api/v1/status")
             
             if response.status_code == 200:
@@ -80,9 +80,9 @@ async def test_api():
         
         logger.info("🚀 Testing PURE Advanced RAG API...")
         
-        async with httpx.AsyncClient(timeout=300.0) as client:
+        async with httpx.AsyncClient(timeout=300.0, verify=False) as client:
             response = await client.post(
-                f"{BASE_URL}/hackrx/run",
+                f"{BASE_URL}/api/v1/hackrx/run",
                 headers=headers,
                 json=TEST_REQUEST
             )

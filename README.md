@@ -46,14 +46,15 @@ python main.py
 
 ### API Endpoints
 
-- `GET /health` - Health check
+- `GET /api/v1/` - Root endpoint
+- `GET /api/v1/health` - Health check
 - `GET /api/v1/status` - System status
-- `POST /hackrx/run` - Main query endpoint
+- `POST /api/v1/hackrx/run` - Main query endpoint
 
 ### Example Request
 
 ```bash
-curl -X POST "http://localhost:8000/hackrx/run" \
+curl -X POST "https://localhost:8000/api/v1/hackrx/run" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer c1c19bb08f894ca1605c6cf9cf949ed137a2857e14dc46a322a1417058a80507" \
   -d '{
