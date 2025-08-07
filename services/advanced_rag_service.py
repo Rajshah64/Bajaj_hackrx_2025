@@ -16,6 +16,7 @@ import re
 import PyPDF2
 import pdfplumber
 import fitz  # PyMuPDF
+import os
 
 # Use loguru for better logging
 try:
@@ -37,19 +38,33 @@ class AdvancedRAGService:
 
     def __init__(self,
                  embedding_model: str = "BAAI/bge-large-en-v1.5",
-                 reranker_model: str = "BAAI/bge-reranker-large"):
+                 reranker_model: str = "BAAI/bge-reranker-large",
+                 device: str | None = None):
                 #  embedding_model: str = "all-MiniLM-L6-v2",
                 #  reranker_model: str = "cross-encoder/ms-marco-MiniLM-L-6-v2"):
         """
         Initializes the service with embedding and reranking models.
         """
         try:
+            # Determine and validate device
+            requested_device = device or os.getenv("RAG_DEVICE")
+            if requested_device:
+                requested_device = requested_device.lower().strip()
+            if requested_device == "cuda" and not torch.cuda.is_available():
+                logger.warning("CUDA requested but not available. Falling back to CPU.")
+                requested_device = "cpu"
+            if requested_device not in {None, "cuda", "cpu"}:
+                logger.warning(f"Unknown device '{requested_device}', falling back to auto-detect.")
+                requested_device = None
+            self.device = requested_device or ("cuda" if torch.cuda.is_available() else "cpu")
+            logger.info(f"Using device: {self.device}")
+
             self.embedding_model_name = embedding_model
-            self.embedding_model = SentenceTransformer(embedding_model)
+            self.embedding_model = SentenceTransformer(embedding_model, device=self.device)
             self.embedding_dim = self.embedding_model.get_sentence_embedding_dimension()
 
             self.reranker_model_name = reranker_model
-            self.reranker = CrossEncoder(reranker_model)
+            self.reranker = CrossEncoder(reranker_model, device=self.device)
 
             # Vector index for semantic search
             self.faiss_index = None
@@ -57,7 +72,7 @@ class AdvancedRAGService:
             self.bm25_index = None
 
             self.document_chunks = []
-            logger.info(f"🚀 Initialized AdvancedRAGService with embedding model: '{embedding_model}' and reranker: '{reranker_model}'")
+            logger.info(f"Initialized AdvancedRAGService with embedding model: '{embedding_model}' and reranker: '{reranker_model}'")
 
         except Exception as e:
             logger.error(f"❌ Error initializing service: {e}")
@@ -72,7 +87,7 @@ class AdvancedRAGService:
             chunk_strategy (str): The chunking strategy for unstructured
         """
         try:
-            logger.info(f"📥 Downloading PDF from: {pdf_url[:50]}...")
+            logger.info(f"Downloading PDF from: {pdf_url[:50]}...")
             
             # Download PDF
             async with httpx.AsyncClient(timeout=60.0) as client:
@@ -80,7 +95,7 @@ class AdvancedRAGService:
                 response.raise_for_status()
                 pdf_content = response.content
             
-            logger.info(f"✅ Downloaded {len(pdf_content)} bytes")
+            logger.info(f"Downloaded {len(pdf_content)} bytes")
             
             # Save temporarily for processing
             temp_pdf_path = "temp_document.pdf"
@@ -94,7 +109,7 @@ class AdvancedRAGService:
             Path(temp_pdf_path).unlink(missing_ok=True)
             
         except Exception as e:
-            logger.error(f"❌ Error downloading and processing PDF: {e}")
+            logger.error(f"Error downloading and processing PDF: {e}")
             raise
 
     async def process_and_load_pdf(self, pdf_path: str, chunk_strategy: str = "auto"):
@@ -107,7 +122,7 @@ class AdvancedRAGService:
             chunk_strategy (str): The chunking strategy (for compatibility, not used).
         """
         try:
-            logger.info(f"🔍 Processing PDF '{pdf_path}' with advanced multi-method extraction...")
+            logger.info(f"Processing PDF '{pdf_path}' with advanced multi-method extraction...")
             
             # Use asyncio to run the CPU-intensive operation in a thread
             extracted_content = await asyncio.to_thread(self._extract_pdf_content, pdf_path)
@@ -116,7 +131,7 @@ class AdvancedRAGService:
             chunks = self._create_intelligent_chunks(extracted_content)
             
             self.document_chunks = [chunk for chunk in chunks if chunk['text'] and len(chunk['text'].strip()) > 20]
-            logger.info(f"✅ Successfully extracted {len(self.document_chunks)} chunks from the PDF.")
+            logger.info(f"Successfully extracted {len(self.document_chunks)} chunks from the PDF.")
 
             await self._build_indexes()
 
@@ -128,33 +143,33 @@ class AdvancedRAGService:
         """Extract content from PDF using multiple methods"""
         try:
             # Method 1: Try pdfplumber first (best for tables)
-            logger.info("📄 Trying pdfplumber extraction...")
+            logger.info("Trying pdfplumber extraction...")
             content = self._extract_with_pdfplumber(pdf_path)
             if content['text'] and len(content['text']) > 100:
-                logger.info(f"✅ pdfplumber successful: {len(content['text'])} chars")
+                logger.info(f"pdfplumber successful: {len(content['text'])} chars")
                 return content
         except Exception as e:
-            logger.warning(f"⚠️ pdfplumber failed: {e}")
+            logger.warning(f"pdfplumber failed: {e}")
         
         try:
             # Method 2: Try PyMuPDF
-            logger.info("📄 Trying PyMuPDF extraction...")
+            logger.info("Trying PyMuPDF extraction...")
             content = self._extract_with_pymupdf(pdf_path)
             if content['text'] and len(content['text']) > 100:
-                logger.info(f"✅ PyMuPDF successful: {len(content['text'])} chars")
+                logger.info(f"PyMuPDF successful: {len(content['text'])} chars")
                 return content
         except Exception as e:
-            logger.warning(f"⚠️ PyMuPDF failed: {e}")
+            logger.warning(f"PyMuPDF failed: {e}")
         
         try:
             # Method 3: Fallback to PyPDF2
-            logger.info("📄 Trying PyPDF2 extraction...")
+            logger.info("Trying PyPDF2 extraction...")
             content = self._extract_with_pypdf2(pdf_path)
             if content['text'] and len(content['text']) > 50:
-                logger.info(f"✅ PyPDF2 successful: {len(content['text'])} chars")
+                logger.info(f"PyPDF2 successful: {len(content['text'])} chars")
                 return content
         except Exception as e:
-            logger.warning(f"⚠️ PyPDF2 failed: {e}")
+            logger.warning(f"PyPDF2 failed: {e}")
         
         raise Exception("All PDF extraction methods failed")
 
@@ -335,7 +350,7 @@ class AdvancedRAGService:
         if not self.document_chunks:
             raise ValueError("No document chunks to index. Run process_and_load_pdf first.")
 
-        logger.info("🏗️ Building FAISS and BM25 indexes...")
+        logger.info("Building FAISS and BM25 indexes...")
 
         # --- FAISS Index (for semantic search) ---
         texts = [chunk['text'] for chunk in self.document_chunks]
@@ -349,15 +364,37 @@ class AdvancedRAGService:
         )
         embeddings = np.array(embeddings).astype('float32')
 
-        self.faiss_index = faiss.IndexFlatIP(self.embedding_dim)  # Use Inner Product for cosine similarity
-        faiss.normalize_L2(embeddings)  # Normalize for cosine similarity
+        # Build FAISS index with optional GPU acceleration
+        try:
+            faiss.normalize_L2(embeddings)
+            if self.device == "cuda" and hasattr(faiss, "StandardGpuResources"):
+                num_gpus = 0
+                try:
+                    num_gpus = faiss.get_num_gpus()
+                except Exception:
+                    num_gpus = 0
+                if num_gpus > 0:
+                    res = faiss.StandardGpuResources()
+                    cpu_index = faiss.IndexFlatIP(self.embedding_dim)
+                    self.faiss_index = faiss.index_cpu_to_gpu(res, 0, cpu_index)
+                    logger.info("FAISS GPU index enabled")
+                else:
+                    self.faiss_index = faiss.IndexFlatIP(self.embedding_dim)
+                    logger.info("FAISS CPU index enabled (no GPUs detected by FAISS)")
+            else:
+                self.faiss_index = faiss.IndexFlatIP(self.embedding_dim)
+                logger.info("FAISS CPU index enabled")
+        except Exception as e:
+            logger.warning(f"Could not enable FAISS GPU ({e}); falling back to CPU")
+            self.faiss_index = faiss.IndexFlatIP(self.embedding_dim)
+
         self.faiss_index.add(embeddings)
-        logger.info(f"✅ FAISS index built with {self.faiss_index.ntotal} vectors.")
+        logger.info(f"FAISS index built with {self.faiss_index.ntotal} vectors.")
 
         # --- BM25 Index (for keyword search) ---
         tokenized_corpus = [doc.lower().split(" ") for doc in texts]
         self.bm25_index = BM25Okapi(tokenized_corpus)
-        logger.info("✅ BM25 index built.")
+        logger.info("BM25 index built.")
 
     def query(self, query: str, top_k: int = 5) -> List[Dict[str, Any]]:
         """
@@ -373,7 +410,7 @@ class AdvancedRAGService:
         if not self.faiss_index or not self.bm25_index:
             raise RuntimeError("Indexes are not built. Call process_and_load_pdf first.")
 
-        logger.info(f"🎯 Executing advanced query for: '{query[:50]}...'")
+        logger.info(f"Executing advanced query for: '{query[:50]}...'")
 
         # --- Stage 1: Hybrid Retrieval ---
         # Retrieve more candidates than needed for the reranker (e.g., 5x top_k)
@@ -404,7 +441,7 @@ class AdvancedRAGService:
                 if len(retrieved_chunks) >= candidate_count:
                     break
         
-        logger.info(f"📊 Retrieved {len(retrieved_chunks)} unique candidates via hybrid search.")
+        logger.info(f"Retrieved {len(retrieved_chunks)} unique candidates via hybrid search.")
 
         # --- Stage 2: Cross-Encoder Reranking ---
         if not retrieved_chunks:
@@ -422,7 +459,7 @@ class AdvancedRAGService:
         # Sort by the new rerank_score
         results = sorted(retrieved_chunks, key=lambda x: x['rerank_score'], reverse=True)
 
-        logger.info(f"🏆 Reranked results. Top result score: {results[0]['rerank_score']:.4f}")
+        logger.info(f"Reranked results. Top result score: {results[0]['rerank_score']:.4f}")
         
         # Log top 3 results for debugging
         for i, result in enumerate(results[:3]):
@@ -481,7 +518,7 @@ class AdvancedRAGService:
         results = self.query(query, top_k=8)
         
         if not results:
-            logger.warning("⚠️ No relevant context found with advanced search")
+            logger.warning("No relevant context found with advanced search")
             return ""
         
         context_parts = []
@@ -507,7 +544,7 @@ class AdvancedRAGService:
                 break
         
         context = "\n\n---\n\n".join(context_parts)
-        logger.info(f"📝 Generated ADVANCED context: {len(context)} chars from {len(context_parts)} chunks")
+        logger.info(f"Generated ADVANCED context: {len(context)} chars from {len(context_parts)} chunks")
         
         return context
 
@@ -561,7 +598,7 @@ if __name__ == "__main__":
 
             # The top result is now highly likely to be the correct answer
             best_answer_context = top_results[0]['text']
-            print(f"✅ Best Context Found (Score: {top_results[0]['rerank_score']:.4f}):\n")
+            print(f"Best Context Found (Score: {top_results[0]['rerank_score']:.4f}):\n")
             print(best_answer_context)
             print("\n" + "="*50)
 

@@ -95,7 +95,7 @@ async def test_direct_advanced_rag():
     """Test the advanced RAG service directly"""
     try:
         print("\n" + "="*100)
-        print("🚀 TESTING ADVANCED RAG DIRECTLY")
+        print("TESTING ADVANCED RAG DIRECTLY")
         print("="*100)
         
         # Import the advanced RAG service
@@ -105,14 +105,14 @@ async def test_direct_advanced_rag():
         rag_service = AdvancedRAGService()
         
         # Process document
-        logger.info("📥 Processing document with Advanced RAG...")
+        logger.info("Processing document with Advanced RAG...")
         doc_url = SAMPLE_REQUEST['documents']
         await rag_service.download_and_process_pdf(doc_url)
         
         # Test the critical cataract surgery question
         question = "How does the policy define a 'Hospital'?"
         
-        print(f"\n🎯 ADVANCED RAG RESULTS FOR: '{question}'")
+        print(f"\nADVANCED RAG RESULTS FOR: '{question}'")
         print("-"*100)
         
         # Get results using advanced pipeline
@@ -123,7 +123,7 @@ async def test_direct_advanced_rag():
             confidence = "HIGH" if rerank_score > 70 else "MEDIUM" if rerank_score > 50 else "LOW"
             chunk_type = result['metadata'].get('type', 'unknown')
             
-            print(f"\n📄 Rank #{i+1} - Rerank Score: {rerank_score:.1f}% ({confidence})")
+            print(f"\nRank #{i+1} - Rerank Score: {rerank_score:.1f}% ({confidence})")
             print(f"   Content Type: {chunk_type}")
             print(f"   Element Type: {result['metadata'].get('element_type', 'unknown')}")
             print(f"   Text: {result['text'][:250]}...")
@@ -145,7 +145,7 @@ async def test_main_endpoint():
             "Authorization": f"Bearer {BEARER_TOKEN}"
         }
         
-        logger.info("🚀 Testing advanced RAG API endpoint...")
+        logger.info("Testing advanced RAG API endpoint...")
         
         start_time = time.time()
         
@@ -163,17 +163,17 @@ async def test_main_endpoint():
             data = response.json()
             answers = data.get("answers", [])
             
-            logger.info("✅ Advanced RAG API test passed")
+            logger.info("Advanced RAG API test passed")
             logger.info(f"   Processing time: {processing_time:.2f} seconds")
             logger.info(f"   Answers received: {len(answers)}")
             
             # Print answers
             print("\n" + "="*100)
-            print("🎯 ADVANCED RAG SYSTEM ANSWERS")
+            print("ADVANCED RAG SYSTEM ANSWERS")
             print("="*100)
             
             for i, (question, answer) in enumerate(zip(SAMPLE_REQUEST['questions'], answers)):
-                print(f"\n🔹 Question {i+1}:")
+                print(f"\nQuestion {i+1}:")
                 print(f"   {question}")
                 print(f"\n💡 Advanced RAG Answer:")
                 print(f"   {answer}")
@@ -193,7 +193,7 @@ async def test_main_endpoint():
 def evaluate_answers(generated_answers):
     """Evaluate the quality of generated answers"""
     try:
-        logger.info("\n📊 EVALUATING ANSWER QUALITY:")
+        logger.info("\nEVALUATING ANSWER QUALITY:")
         
         total_score = 0
         max_score = len(EXPECTED_ANSWERS)
@@ -221,11 +221,11 @@ def evaluate_answers(generated_answers):
                         score = 1
             
             total_score += score
-            status = "✅" if score == 1 else "❌"
+            status = "PASS" if score == 1 else "FAIL"
             logger.info(f"   {status} Question {i+1}: {'PASS' if score == 1 else 'FAIL'}")
         
         accuracy = (total_score / max_score) * 100 if max_score > 0 else 0
-        logger.info(f"\n📈 OVERALL ACCURACY: {accuracy:.1f}% ({total_score}/{max_score})")
+        logger.info(f"\nOVERALL ACCURACY: {accuracy:.1f}% ({total_score}/{max_score})")
         
         return accuracy
         
@@ -235,44 +235,44 @@ def evaluate_answers(generated_answers):
 
 async def run_full_test_suite():
     """Run the complete advanced RAG test suite"""
-    print("🧪 ADVANCED RAG-POWERED QUERY-RETRIEVAL SYSTEM - TEST SUITE")
+    print("ADVANCED RAG-POWERED QUERY-RETRIEVAL SYSTEM - TEST SUITE")
     print("=" * 100)
     
     # Test 1: Health Check
-    print("\n1️⃣ Testing Health Endpoint...")
+    print("\nTesting Health Endpoint...")
     health_ok = await test_health_endpoint()
     
     # Test 2: Status Check
-    print("\n2️⃣ Testing Status Endpoint...")
+    print("\nTesting Status Endpoint...")
     status_ok = await test_status_endpoint()
     
     # Test 3: Direct Advanced RAG
-    print("\n3️⃣ Testing Advanced RAG Direct...")
+    print("\nTesting Advanced RAG Direct...")
     rag_ok = await test_direct_advanced_rag()
     
     # Test 4: Advanced API
-    print("\n4️⃣ Testing Advanced RAG API...")
+    print("\nTesting Advanced RAG API...")
     api_ok, answers = await test_main_endpoint()
     
     # Final Results
     print("\n" + "="*100)
-    print("📊 ADVANCED RAG SYSTEM TEST RESULTS:")
+    print("ADVANCED RAG SYSTEM TEST RESULTS:")
     print("="*100)
-    print(f"Health Check:         {'✅ PASS' if health_ok else '❌ FAIL'}")
-    print(f"Status Check:         {'✅ PASS' if status_ok else '❌ FAIL'}")
-    print(f"Advanced RAG Direct:  {'✅ PASS' if rag_ok else '❌ FAIL'}")
-    print(f"Advanced RAG API:     {'✅ PASS' if api_ok else '❌ FAIL'}")
+    print(f"Health Check:         {'PASS' if health_ok else 'FAIL'}")
+    print(f"Status Check:         {'PASS' if status_ok else 'FAIL'}")
+    print(f"Advanced RAG Direct:  {'PASS' if rag_ok else 'FAIL'}")
+    print(f"Advanced RAG API:     {'PASS' if api_ok else 'FAIL'}")
     
     overall_status = health_ok and status_ok and rag_ok and api_ok
-    print(f"\n🎯 OVERALL STATUS: {'🚀 ADVANCED RAG SYSTEM READY' if overall_status else '❌ NEEDS ATTENTION'}")
+    print(f"\nOVERALL STATUS: {'ADVANCED RAG SYSTEM READY' if overall_status else 'NEEDS ATTENTION'}")
     
     if overall_status:
-        print("\n🎉 SUCCESS! The advanced RAG system provides:")
-        print("   ✅ Hybrid Search (BM25 + FAISS) for keyword + semantic matching")
-        print("   ✅ Cross-Encoder Reranking for maximum relevance")
-        print("   ✅ Content-Aware Processing separating text and tables")
-        print("   ✅ Professional-grade retrieval without manual rules")
-        print("   ✅ Scalable architecture that works for any question type")
+        print("\nSUCCESS! The advanced RAG system provides:")
+        print("   Hybrid Search (BM25 + FAISS) for keyword + semantic matching")
+        print("   Cross-Encoder Reranking for maximum relevance")
+        print("   Content-Aware Processing separating text and tables")
+        print("   Professional-grade retrieval without manual rules")
+        print("   Scalable architecture that works for any question type")
     
     print("="*100)
     

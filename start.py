@@ -24,7 +24,7 @@ def check_dependencies():
         import sentence_transformers
         import PyPDF2
         import docx
-        logger.info("✅ All dependencies are installed")
+        logger.info("All dependencies are installed")
         return True
     except ImportError as e:
         logger.error(f"❌ Missing dependency: {e}")
@@ -50,7 +50,7 @@ def setup_environment():
                     f.write("DEBUG=False\n")
                     f.write("LOG_LEVEL=INFO\n")
         
-        logger.info("✅ Environment setup completed")
+        logger.info("Environment setup completed")
         return True
         
     except Exception as e:
@@ -60,7 +60,7 @@ def setup_environment():
 def run_server(host="0.0.0.0", port=8000, reload=False):
     """Run the FastAPI server"""
     try:
-        logger.info(f"🚀 Starting server on {host}:{port}")
+        logger.info(f"Starting server on {host}:{port}")
         logger.info("Press Ctrl+C to stop the server")
         
         cmd = [
@@ -76,14 +76,14 @@ def run_server(host="0.0.0.0", port=8000, reload=False):
         subprocess.run(cmd)
         
     except KeyboardInterrupt:
-        logger.info("🛑 Server stopped by user")
+        logger.info("Server stopped by user")
     except Exception as e:
         logger.error(f"❌ Error running server: {e}")
 
 def run_tests():
     """Run the test suite"""
     try:
-        logger.info("🧪 Running test suite...")
+        logger.info("Running test suite...")
         subprocess.run([sys.executable, "test_system.py"])
     except Exception as e:
         logger.error(f"❌ Error running tests: {e}")
@@ -137,7 +137,7 @@ def main():
         # Default: show help and run server
         parser.print_help()
         print("\n" + "="*60)
-        print("🚀 Starting server with default settings...")
+        print("Starting server with default settings...")
         print("="*60)
         
         if not check_dependencies():

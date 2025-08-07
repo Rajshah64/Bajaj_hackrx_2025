@@ -2,14 +2,14 @@
 
 This guide covers deployment options for the LLM-Powered Intelligent Query-Retrieval System.
 
-## 📋 Prerequisites
+## Prerequisites
 
 - Python 3.8+
 - 8GB+ RAM (recommended for FAISS indexing)
 - OpenAI API key (optional - system has fallback)
 - Docker (for containerized deployment)
 
-## 🚀 Quick Start (Local Development)
+## Quick Start (Local Development)
 
 1. **Install dependencies**:
 
@@ -41,7 +41,7 @@ This guide covers deployment options for the LLM-Powered Intelligent Query-Retri
    python start.py test
    ```
 
-## 🐳 Docker Deployment
+## Docker Deployment
 
 ### Build Docker Image
 
@@ -89,7 +89,7 @@ docker run -p 8000:8000 \
   hackrx-query-system
 ```
 
-## ☁️ Cloud Deployment
+## Cloud Deployment
 
 ### AWS Deployment
 
@@ -171,7 +171,7 @@ az container create \
   --environment-variables OPENAI_API_KEY=your_api_key
 ```
 
-## 🔧 Production Configuration
+## Production Configuration
 
 ### Environment Variables
 
@@ -216,7 +216,7 @@ sudo systemctl enable hackrx-query-system
 sudo systemctl start hackrx-query-system
 ```
 
-## 📊 Monitoring and Logging
+## Monitoring and Logging
 
 ### Health Checks
 
@@ -279,7 +279,7 @@ export OPENAI_API_KEY=$(aws secretsmanager get-secret-value \
   --query SecretString --output text)
 ```
 
-## 📈 Performance Optimization
+## Performance Optimization
 
 ### Scaling Considerations
 
@@ -310,7 +310,7 @@ server {
 }
 ```
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -345,7 +345,7 @@ tail -f /var/log/hackrx-query-system.log
 grep -i error /var/log/hackrx-query-system.log
 ```
 
-## 📞 Support
+## Support
 
 For deployment issues:
 

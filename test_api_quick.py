@@ -34,7 +34,7 @@ async def test_health():
             
             if response.status_code == 200:
                 data = response.json()
-                logger.info("✅ Health check passed")
+                logger.info("Health check passed")
                 logger.info(f"   Version: {data.get('version')}")
                 return True
             else:
@@ -53,13 +53,13 @@ async def test_status():
             
             if response.status_code == 200:
                 data = response.json()
-                logger.info("✅ Status check passed")
+                logger.info("Status check passed")
                 logger.info(f"   Version: {data.get('version')}")
                 logger.info(f"   Features: {data.get('features', [])}")
                 
                 # Check if it's the pure advanced version
                 if "PURE ADVANCED RAG" in data.get('version', ''):
-                    logger.info("🚀 PURE ADVANCED RAG confirmed!")
+                    logger.info("PURE ADVANCED RAG confirmed!")
                 
                 return True
             else:
@@ -78,7 +78,7 @@ async def test_api():
             "Authorization": f"Bearer {BEARER_TOKEN}"
         }
         
-        logger.info("🚀 Testing PURE Advanced RAG API...")
+        logger.info("Testing PURE Advanced RAG API...")
         
         async with httpx.AsyncClient(timeout=300.0, verify=False) as client:
             response = await client.post(
@@ -91,24 +91,24 @@ async def test_api():
             data = response.json()
             answers = data.get("answers", [])
             
-            logger.info("✅ API test passed")
+            logger.info("API test passed")
             logger.info(f"   Answers received: {len(answers)}")
             
             # Check answers for the problematic questions
-            print("\n🎯 ANSWERS FROM PURE ADVANCED RAG:")
+            print("\nANSWERS FROM PURE ADVANCED RAG:")
             print("=" * 100)
             
             for i, (question, answer) in enumerate(zip(TEST_REQUEST['questions'], answers)):
-                print(f"\n🔹 Question {i+1}:")
+                print(f"\nQuestion {i+1}:")
                 print(f"   {question}")
                 print(f"\n💡 Pure Advanced RAG Answer:")
                 print(f"   {answer}")
                 
                 # Check if we still get the "OpenAI API key" fallback
                 if "OpenAI API key" in answer or "valid OpenAI API key" in answer:
-                    print(f"   ❌ STILL GETTING FALLBACK MESSAGE!")
+                    print(f"   STILL GETTING FALLBACK MESSAGE!")
                 else:
-                    print(f"   ✅ PROPER ANSWER GENERATED!")
+                    print(f"   PROPER ANSWER GENERATED!")
                 
                 print("-" * 80)
             
@@ -125,31 +125,31 @@ async def test_api():
 
 async def run_quick_test():
     """Run quick test suite"""
-    print("🧪 QUICK TEST OF PURE ADVANCED RAG SYSTEM")
+    print("QUICK TEST OF PURE ADVANCED RAG SYSTEM")
     print("=" * 80)
     
     # Test 1: Health
-    print("\n1️⃣ Testing Health...")
+    print("\nTesting Health...")
     health_ok = await test_health()
     
     # Test 2: Status  
-    print("\n2️⃣ Testing Status...")
+    print("\nTesting Status...")
     status_ok = await test_status()
     
     # Test 3: API
-    print("\n3️⃣ Testing API...")
+    print("\nTesting API...")
     api_ok, answers = await test_api()
     
     # Results
     print("\n" + "="*80)
-    print("📊 QUICK TEST RESULTS:")
+    print("QUICK TEST RESULTS:")
     print("="*80)
-    print(f"Health:  {'✅ PASS' if health_ok else '❌ FAIL'}")
-    print(f"Status:  {'✅ PASS' if status_ok else '❌ FAIL'}")
-    print(f"API:     {'✅ PASS' if api_ok else '❌ FAIL'}")
+    print(f"Health:  {'PASS' if health_ok else 'FAIL'}")
+    print(f"Status:  {'PASS' if status_ok else 'FAIL'}")
+    print(f"API:     {'PASS' if api_ok else 'FAIL'}")
     
     if health_ok and status_ok and api_ok:
-        print("\n🎉 PURE ADVANCED RAG SYSTEM IS WORKING!")
+        print("\nPURE ADVANCED RAG SYSTEM IS WORKING!")
     else:
         print("\n❌ SYSTEM HAS ISSUES")
     

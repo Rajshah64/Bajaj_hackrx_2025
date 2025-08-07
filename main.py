@@ -36,7 +36,8 @@ security = HTTPBearer()
 BEARER_TOKEN = "c1c19bb08f894ca1605c6cf9cf949ed137a2857e14dc46a322a1417058a80507"
 
 # Initialize services with PURE ADVANCED RAG
-advanced_rag_service = AdvancedRAGService()  # 🚀 PURE ADVANCED RAG SERVICE
+# Allow device override via env var RAG_DEVICE (e.g., "cuda" or "cpu")
+advanced_rag_service = AdvancedRAGService(device=os.getenv("RAG_DEVICE"))  # PURE ADVANCED RAG SERVICE
 llm_service = LLMService()
 
 # Configure logging
@@ -85,13 +86,13 @@ async def process_queries(
     4. Returns highly accurate answers (NO OLD COMPONENTS)
     """
     try:
-        logger.info(f"🚀 Processing PURE ADVANCED RAG request with {len(request.questions)} questions")
+        logger.info(f"Processing PURE ADVANCED RAG request with {len(request.questions)} questions")
         logger.info(f"   Document URL: {request.documents}")
         
         # Use PURE advanced RAG processing (no old components)
         answers = await process_queries_pure_advanced_rag(request.documents, request.questions)
         
-        logger.info(f"✅ Generated {len(answers)} answers using PURE ADVANCED RAG")
+        logger.info(f"Generated {len(answers)} answers using PURE ADVANCED RAG")
         
         return QueryResponse(answers=answers)
         
@@ -109,12 +110,12 @@ async def process_queries_pure_advanced_rag(document_url: str, questions: List[s
     try:
         # Check if we already have the document processed
         if not advanced_rag_service.faiss_index:
-            logger.info("🔄 Processing document with PURE Advanced RAG...")
+            logger.info("Processing document with PURE Advanced RAG...")
             await advanced_rag_service.download_and_process_pdf(document_url)
         
         answers = []
         for i, question in enumerate(questions):
-            logger.info(f"🎯 Processing question {i+1}/{len(questions)}: {question[:50]}...")
+            logger.info(f"Processing question {i+1}/{len(questions)}: {question[:50]}...")
             
             try:
                 # Get the best context using PURE advanced RAG
@@ -134,7 +135,7 @@ async def process_queries_pure_advanced_rag(document_url: str, questions: List[s
                 context = "\n\n---\n\n".join(context_parts)
                 
                 # Log the context being used
-                logger.info(f"   📄 Using context from {len(context_parts)} chunks, total length: {len(context)}")
+                logger.info(f"   Using context from {len(context_parts)} chunks, total length: {len(context)}")
                 
                 # Generate answer using LLM
                 answer = await llm_service.generate_answer(
@@ -144,7 +145,7 @@ async def process_queries_pure_advanced_rag(document_url: str, questions: List[s
                 )
                 
                 answers.append(answer)
-                logger.info(f"✅ Generated answer {i+1}/{len(questions)}")
+                logger.info(f"Generated answer {i+1}/{len(questions)}")
                 
             except Exception as e:
                 logger.error(f"❌ Error processing question {i+1}: {str(e)}")
@@ -192,5 +193,5 @@ async def get_status():
 
 if __name__ == "__main__":
     import uvicorn
-    logger.info("🚀 Starting PURE ADVANCED RAG-Powered Query-Retrieval System")
+    logger.info("Starting PURE ADVANCED RAG-Powered Query-Retrieval System")
     uvicorn.run(app, host="0.0.0.0", port=8000) 

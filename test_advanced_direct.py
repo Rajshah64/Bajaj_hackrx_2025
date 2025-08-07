@@ -13,22 +13,22 @@ logger = logging.getLogger(__name__)
 async def test_advanced_rag_direct():
     """Test the advanced RAG service directly"""
     try:
-        print("🧪 TESTING ADVANCED RAG SERVICE DIRECTLY")
+        print("TESTING ADVANCED RAG SERVICE DIRECTLY")
         print("=" * 80)
         
         # Import the advanced RAG service
         from services.advanced_rag_service import AdvancedRAGService
         
         # Initialize service
-        logger.info("1️⃣ Initializing AdvancedRAGService...")
+        logger.info("Initializing AdvancedRAGService...")
         rag_service = AdvancedRAGService()
-        logger.info("✅ Service initialized successfully")
+        logger.info("Service initialized successfully")
         
         # Process document
-        logger.info("2️⃣ Processing PDF document...")
+        logger.info("Processing PDF document...")
         doc_url = "https://hackrx.blob.core.windows.net/assets/policy.pdf?sv=2023-01-03&st=2025-07-04T09%3A11%3A24Z&se=2027-07-05T09%3A11%3A00Z&sr=b&sp=r&sig=N4a9OU0w0QXO6AOIBiu4bpl7AXvEZogeT%2FjUHNO7HzQ%3D"
         await rag_service.download_and_process_pdf(doc_url)
-        logger.info("✅ Document processed successfully")
+        logger.info("Document processed successfully")
         
         # Test critical questions
         test_questions = [
@@ -37,11 +37,11 @@ async def test_advanced_rag_direct():
             "How does the policy define a 'Hospital'?"
         ]
         
-        print("\n3️⃣ TESTING QUESTIONS:")
+        print("\nTESTING QUESTIONS:")
         print("-" * 80)
         
         for i, question in enumerate(test_questions):
-            print(f"\n🔹 Question {i+1}: {question}")
+            print(f"\nQuestion {i+1}: {question}")
             print("-" * 60)
             
             # Get results using advanced pipeline
@@ -51,7 +51,7 @@ async def test_advanced_rag_direct():
                 print("❌ No results found!")
                 continue
             
-            print(f"📊 Found {len(results)} results:")
+            print(f"Found {len(results)} results:")
             
             for j, result in enumerate(results[:3]):  # Show top 3
                 rerank_score = result['rerank_score'] * 100
@@ -59,20 +59,20 @@ async def test_advanced_rag_direct():
                 chunk_type = result['metadata'].get('type', 'unknown')
                 extraction_method = result['metadata'].get('extraction_method', 'unknown')
                 
-                print(f"\n   📄 Rank #{j+1}:")
+                print(f"\n   Rank #{j+1}:")
                 print(f"      Rerank Score: {rerank_score:.1f}% ({confidence})")
                 print(f"      Content Type: {chunk_type}")
                 print(f"      Extraction Method: {extraction_method}")
                 print(f"      Text Preview: {result['text'][:200]}...")
         
         # Test embedding stats
-        print("\n4️⃣ EMBEDDING STATS:")
+        print("\nEMBEDDING STATS:")
         print("-" * 80)
         stats = rag_service.get_embedding_stats()
         for key, value in stats.items():
             print(f"   {key}: {value}")
         
-        print("\n✅ ALL TESTS COMPLETED SUCCESSFULLY!")
+        print("\nALL TESTS COMPLETED SUCCESSFULLY!")
         print("=" * 80)
         
         return True
@@ -86,4 +86,4 @@ async def test_advanced_rag_direct():
 if __name__ == "__main__":
     print("Starting direct advanced RAG test...")
     result = asyncio.run(test_advanced_rag_direct())
-    print(f"\nTest result: {'✅ SUCCESS' if result else '❌ FAILED'}")
+    print(f"\nTest result: {'SUCCESS' if result else 'FAILED'}")
