@@ -67,7 +67,7 @@ data/
 *.pdf
 *.docx
 *.doc
-*.txt
+
 
 # Model files and caches
 *.pkl
